@@ -77,3 +77,35 @@ export async function getServiceBySlug(slug: string) {
     },
   });
 }
+
+// Get provider by Id
+export async function getProviderById(pid: string) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("providers", `provider-${pid}`);
+
+  const provider = await prisma.provider.findUnique({
+    where: { id: pid },
+    include: {
+      user: { select: { name: true } },
+      service: { select: { name: true, slug: true, icon: true } },
+      reviews: { orderBy: { createdAt: "desc" } },
+    },
+  });
+
+  // Pending, suspended and missing providers all look the smae to the public
+  if (!provider || provider.status !== "approved") return null;
+  return provider;
+}
+
+// Get approved provider Ids
+export async function getApprovedProvidersIds() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("providers");
+
+  return prisma.provider.findMany({
+    where: { status: "approved" },
+    select: { id: true },
+  })
+}

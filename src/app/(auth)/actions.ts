@@ -1,7 +1,8 @@
 "use server"
 
 import { createUser, getUserByEmail } from "@/lib/db";
-import { createSession } from "@/lib/session";
+import type { Role } from "@/lib/jwt";
+import { createSession, deleteSession } from "@/lib/session";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 
@@ -12,6 +13,14 @@ export type SignupState =
     }
     | undefined;
 
+export type LoginState =
+    | { error?: string; values?: { email: string } }
+    | undefined;
+
+// A throwaway hash, used so a missing user costs the same time as a wrong password
+const DUMMY_HASH = bcrypt.hashSync("not-a-real-password", 10)
+
+// Signup
 export async function signup(
     prevState: SignupState,
     formData: FormData
@@ -50,4 +59,43 @@ export async function signup(
 
     // Go home
     redirect("/");
+}
+
+
+// Login
+export async function Login(
+    prevState: LoginState,
+    formData: FormData
+): Promise<LoginState> {
+    // Read the values
+    const email = String(formData.get("email") ?? "").trim().toLowerCase();
+    const password = String(formData.get("password") ?? "");
+    const values = { email };
+
+    // Both fields are required
+    if (!email || !password) {
+        return { error: "Please enter your email and password.", values };
+    }
+
+    // Look up the user, then compare. Always run one compare.
+    const user = await getUserByEmail(email);
+    const valid = await bcrypt.compare(password, user?.passwordHash ?? DUMMY_HASH);
+
+    // One vague message for every failure
+    if (!user || !valid) {
+        return { error: "Incorrect email or password.", values };
+    }
+
+    // Log them in
+    await createSession(user.id, user.role as Role);
+
+    // 7. Go home (we'll send each role to its own area later)
+    redirect("/");
+}
+
+
+// Logout
+export async function logout() {
+    await deleteSession();
+    redirect("/login");
 }

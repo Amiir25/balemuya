@@ -109,3 +109,21 @@ export async function getApprovedProvidersIds() {
     select: { id: true },
   })
 }
+
+// =========== Auth Function =========== //
+
+// Get Email by Id
+export function getUserByEmail(email: string) {
+  return prisma.user.findUnique({ where: { email } });
+}
+
+// Create new user
+export function createUser(data: {
+  name: string;
+  email: string;
+  passwordHash: string;
+  role: "customer" | "provider";
+  phone: string;
+}) {
+  return prisma.user.create({ data });
+}

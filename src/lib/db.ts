@@ -127,3 +127,11 @@ export function createUser(data: {
 }) {
   return prisma.user.create({ data });
 }
+
+// Get user by Id
+export function getUserById(id: string) {
+  return prisma.user.findUnique({
+    where: { id },
+    select: { id: true, name: true, role: true },
+  });
+}

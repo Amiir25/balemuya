@@ -160,3 +160,24 @@ export function getBookingsByCustomer(customerId: string) {
     include: { provider: { include: { user: { select: { name: true } } } } },
   });
 }
+
+// =========== BOOKING =========== //
+// Fresh check (not the cached one): is this provider bookable right now?
+export function getBookableProvider(id: string) {
+  return prisma.provider.findFirst({
+    where: { id, status: "approved" },
+    select: { id: true },
+  });
+}
+
+// Create booking
+export function createBooking(data: {
+  customerId: string;
+  providerId: string;
+  scheduledDate: Date;
+  scheduledTime: string;
+  address: string;
+  notes?: string;
+}) {
+  return prisma.booking.create({ data });
+}

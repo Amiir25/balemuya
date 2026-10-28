@@ -3,12 +3,15 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { Login } from "../actions";
+import { useSearchParams } from "next/navigation";
 
 export default function LoginForm() {
   const [state, action, pending] = useActionState(Login, undefined);
+  const next = useSearchParams().get("next") ?? "";
 
   return (
     <form action={action} className="space-y-4">
+      <input type="hidden" name="next" value={next} />
       <p
         role="alert"
         className={`min-h-5 text-sm text-red-600 transition-opacity duration-300 ${
@@ -19,7 +22,9 @@ export default function LoginForm() {
       </p>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium">Email</label>
+        <label htmlFor="email" className="block text-sm font-medium">
+          Email
+        </label>
         <input
           id="email"
           name="email"
@@ -31,7 +36,9 @@ export default function LoginForm() {
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium">Password</label>
+        <label htmlFor="password" className="block text-sm font-medium">
+          Password
+        </label>
         <input
           id="password"
           name="password"
@@ -51,7 +58,9 @@ export default function LoginForm() {
 
       <p className="text-center text-sm text-gray-600">
         New here?{" "}
-        <Link href="/signup" className="underline">Create an account</Link>
+        <Link href="/signup" className="underline">
+          Create an account
+        </Link>
       </p>
     </form>
   );

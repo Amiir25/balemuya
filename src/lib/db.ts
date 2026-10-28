@@ -44,7 +44,7 @@ export async function getAllServicesWithProviders(perService = 4) {
   });
 
   // hide services that have no approved providers yet
-  return services.filter((s) => s.providers.length > 0);  
+  return services.filter((s) => s.providers.length > 0);
 }
 
 // Get service detail
@@ -143,6 +143,8 @@ export function getProviderByUserId(userId: string) {
   return prisma.provider.findUnique({ where: { userId } });
 }
 
+
+// =========== BOOKING =========== //
 // Get bookings by provider
 export function getBookingsByProvider(providerId: string) {
   return prisma.booking.findMany({
@@ -157,11 +159,17 @@ export function getBookingsByCustomer(customerId: string) {
   return prisma.booking.findMany({
     where: { customerId },
     orderBy: { createdAt: "desc" },
-    include: { provider: { include: { user: { select: { name: true } } } } },
+    include: {
+      provider: {
+        include: {
+          user: { select: { name: true } },
+          service: { select: { name: true } },
+        },
+      },
+    },
   });
 }
 
-// =========== BOOKING =========== //
 // Fresh check (not the cached one): is this provider bookable right now?
 export function getBookableProvider(id: string) {
   return prisma.provider.findFirst({

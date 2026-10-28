@@ -137,3 +137,26 @@ export function getUserById(id: string) {
     select: { id: true, name: true, role: true },
   });
 }
+
+// Get provider by user Id
+export function getProviderByUserId(userId: string) {
+  return prisma.provider.findUnique({ where: { userId } });
+}
+
+// Get bookings by provider
+export function getBookingsByProvider(providerId: string) {
+  return prisma.booking.findMany({
+    where: { providerId },
+    orderBy: { createdAt: "desc" },
+    include: { customer: { select: { name: true, phone: true } } },
+  });
+}
+
+// Get bookings by customer
+export function getBookingsByCustomer(customerId: string) {
+  return prisma.booking.findMany({
+    where: { customerId },
+    orderBy: { createdAt: "desc" },
+    include: { provider: { include: { user: { select: { name: true } } } } },
+  });
+}

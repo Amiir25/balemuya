@@ -1,24 +1,37 @@
 "use client";
 
-import Link from "next/link";
-import React, { useState } from "react";
-import NavbarProfile from "./NavbarProfile";
-import NavbarLogin from "./NavbarLogin";
+import React, { ReactNode, useState } from "react";
 import NavbarLinks from "./NavbarLinks";
 
-export default function SmallScreenNav() {
-  const [showNav, setShowNav] = useState(true);
+export default function SmallScreenNav({ children }: { children: ReactNode }) {
+  const [showNav, setShowNav] = useState(false);
   return (
     <div>
-      <h2 className="text-xl font-semibold" onClick={() => setShowNav(true)}>☰</h2>
+      <button
+        type="button"
+        aria-label="Open menu"
+        className="text-xl font-semibold"
+        onClick={() => setShowNav(true)}
+      >
+        ☰
+      </button>
 
       <div
-        className={`flex flex-col items-center gap-4 absolute -top-1 bg-white p-3
-        ${showNav ? "-left-1" : "-left-200"} w-screen h-screen transition-all duration-300`}
+        onClick={(e) => {
+          if ((e.target as HTMLElement).closest("a")) setShowNav(false);
+        }}
+        className={`flex flex-col items-center gap-4 absolute -top-1 bg-white p-3 z-50
+        ${showNav ? "-left-1" : "left-[-200vw]"} w-screen h-screen transition-all duration-300`}
       >
-        {/* Close */}
-        <h2 className="text-xl font-semibold w-full text-right" onClick={() => setShowNav(false)}>✖</h2>
-        <NavbarLinks/>
+        <button
+          type="button"
+          aria-label="Close menu"
+          className="text-xl font-semibold w-full text-right"
+          onClick={() => setShowNav(false)}
+        >
+          ✖
+        </button>
+        <NavbarLinks>{children}</NavbarLinks>
       </div>
     </div>
   );

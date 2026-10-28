@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import BookingForm from "./BookingForm";
 
 type Props = { params: Promise<{ pid: string }> };
 
@@ -145,15 +146,15 @@ export async function ProviderDetail({ params }: Props) {
           </section>
         </div>
 
-        {/* Right: booking widget slot (built in the booking step) */}
+        {/* Right: booking widget slot */}
         <aside className="md:col-span-1">
           <div className="sticky top-6 rounded-xl border p-5">
             <h2 className="font-semibold">Book {p.user.name.split(" ")[0]}</h2>
             <p className="mt-1 text-sm text-gray-500">
               from {p.priceFrom} ETB {p.priceUnit}
             </p>
-            <div className="mt-4 rounded-lg bg-gray-50 p-4 text-sm text-gray-500">
-              Booking form coming soon.
+            <div className="mt-4">
+              <BookingForm providerId={p.id} />
             </div>
           </div>
         </aside>

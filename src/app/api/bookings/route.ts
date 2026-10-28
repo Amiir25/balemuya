@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/dal";
-import { createBooking, getBookableProvider } from "@/lib/db";
+import { createBooking, getBookableProvider, getBookingsByCustomer } from "@/lib/db";
 
 const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
 
+// POST
 export async function POST(request: Request) {
   // Who is asking, and are they allowed?
   const user = await getCurrentUser();
@@ -68,4 +69,37 @@ export async function POST(request: Request) {
   });
 
   return NextResponse.json({ id: booking.id, status: booking.status }, { status: 201 });
+}
+
+// GET
+export async function GET() {
+  // Who is asking, and are they allowed?
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ error: "Please log in." }, { status: 401 });
+  }
+  if (user.role !== "customer") {
+    return NextResponse.json({ error: "Only customers have bookings here." }, { status: 403 });
+  }
+
+  // Only THIS customer's bookings. The id comes from the session.
+  const bookings = await getBookingsByCustomer(user.id);
+
+  // Send only what the UI needs
+  return NextResponse.json(
+    bookings.map((b) => ({
+      id: b.id,
+      status: b.status,
+      scheduledDate: b.scheduledDate.toISOString().slice(0, 10),
+      scheduledTime: b.scheduledTime,
+      address: b.address,
+      notes: b.notes,
+      createdAt: b.createdAt.toISOString(),
+      provider: {
+        id: b.provider.id,
+        name: b.provider.user.name,
+        service: b.provider.service.name,
+      },
+    }))
+  );
 }

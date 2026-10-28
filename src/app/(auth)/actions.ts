@@ -89,8 +89,8 @@ export async function Login(
     // Log them in
     await createSession(user.id, user.role as Role);
 
-    // 7. Go home (we'll send each role to its own area later)
-    redirect("/");
+    // 7. Redirect each role to the right place
+    redirect(user.role === "admin" ? "/admin" : "/dashboard");
 }
 
 

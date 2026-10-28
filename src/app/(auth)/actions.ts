@@ -20,7 +20,7 @@ export type LoginState =
 // A throwaway hash, used so a missing user costs the same time as a wrong password
 const DUMMY_HASH = bcrypt.hashSync("not-a-real-password", 10)
 
-// Signup
+// ============== SIGNUP ============== //
 export async function signup(
     prevState: SignupState,
     formData: FormData
@@ -62,7 +62,13 @@ export async function signup(
 }
 
 
-// Login
+// Only allow paths inside our own site
+function safeNext(raw: string) {
+    return raw.startsWith("/") && !raw.startsWith("//") && !raw.startsWith("/\\") ? raw : null;
+}
+
+
+// ============== LOGIN ============== //
 export async function Login(
     prevState: LoginState,
     formData: FormData
@@ -89,12 +95,13 @@ export async function Login(
     // Log them in
     await createSession(user.id, user.role as Role);
 
-    // 7. Redirect each role to the right place
-    redirect(user.role === "admin" ? "/admin" : "/dashboard");
+    // Redirect each role to the right place
+    const next = safeNext(String(formData.get("next") ?? ""));
+    redirect(next ?? (user.role === "admin" ? "/admin" : "/dashboard"));
 }
 
 
-// Logout
+// ============== LOGOUT ============== //
 export async function logout() {
     await deleteSession();
     redirect("/login");

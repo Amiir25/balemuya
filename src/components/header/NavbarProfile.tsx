@@ -17,7 +17,10 @@ export default async function NavbarProfile() {
       </div>
 
       {/* Add future links here, one line each */}
-      <Link href="/profile" className={itemClass}>
+      <Link
+        href={user.role === "provider" ? "/dashboard/profile" : "/profile"}
+        className={itemClass}
+      >
         Profile
       </Link>
       <Link href="/settings" className={itemClass}>

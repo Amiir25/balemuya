@@ -4,6 +4,7 @@ import { ADDRESSES, PRICE_UNITS } from "@/lib/constants";
 import { createProviderAccount, createUser, getUserByEmail, serviceExists } from "@/lib/db";
 import type { Role } from "@/lib/jwt";
 import { createSession, deleteSession } from "@/lib/session";
+import { validateProfile } from "@/lib/validation";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 
@@ -138,19 +139,19 @@ export async function signupProvider(
         priceUnit: read("priceUnit"),
     };
     const password = String(formData.get("password") ?? "");
-    const price = Number(values.priceFrom);
+    
+    // Validate the six profile fields (shared with the edit form)
+    const { errors: profileErrors, price } = validateProfile(values);
 
-    const errors: NonNullable<ProviderSignupState>["errors"] = {};
+    // Validate the account fields
+    const errors: NonNullable<ProviderSignupState>["errors"] = {
+        ...profileErrors,
+    };
+
     if (values.name.length < 2) errors.name = "Please enter your name.";
     if (!/^\S+@\S+\.\S+$/.test(values.email)) errors.email = "Please enter a valid email.";
     if (!/^(\+251|0)[79]\d{8}$/.test(values.phone)) errors.phone = "Enter a valid Ethiopian number, like 0911223344.";
     if (password.length < 8) errors.password = "Password must be at least 8 characters.";
-    if (!values.serviceId) errors.serviceId = "Choose your service.";
-    if (!(ADDRESSES as readonly string[]).includes(values.address)) errors.address = "Choose your area.";
-    if (values.headline.length < 5 || values.headline.length > 80) errors.headline = "Headline must be 5 to 80 characters.";
-    if (values.bio.length < 20 || values.bio.length > 600) errors.bio = "Bio must be 20 to 600 characters.";
-    if (!Number.isInteger(price) || price < 50 || price > 100000) errors.priceFrom = "Enter a whole price between 50 and 100,000 ETB.";
-    if (!(PRICE_UNITS as readonly string[]).includes(values.priceUnit)) errors.priceUnit = "Choose a unit.";
 
     if (Object.keys(errors).length > 0) return { errors, values };
 

@@ -189,3 +189,41 @@ export function createBooking(data: {
 }) {
   return prisma.booking.create({ data });
 }
+
+// Check service
+export function serviceExists(id: string) {
+  return prisma.service.findUnique({ where: { id }, select: { id: true } });
+}
+
+// Create provider account
+export function createProviderAccount(data: {
+  user: { name: string; email: string; phone: string; passwordHash: string };
+  provider: {
+    serviceId: string; headline: string; bio: string;
+    priceFrom: number; priceUnit: string; address: string;
+  };
+}) {
+  return prisma.user.create({
+    data: {
+      ...data.user,
+      role: "provider",
+      provider: {
+        create: { ...data.provider, photoUrl: "/people/1.jpg", status: "pending" },
+      },
+    },
+    select: { id: true },
+  });
+}
+
+// Get booking by Id
+export function getBookingById(id: string) {
+  return prisma.booking.findUnique({
+    where: { id },
+    include: { provider: { select: { userId: true, status: true } } },
+  });
+}
+
+// update booking status
+export function updateBookingStatus(id: string, status: "accepted" | "declined") {
+  return prisma.booking.update({ where: { id }, data: { status } });
+}

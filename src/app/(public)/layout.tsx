@@ -1,10 +1,12 @@
 import Header from '@/components/header/Header'
-import React, { ReactNode } from 'react'
+import React, { ReactNode, Suspense } from 'react'
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
     <div>
-        <Header/>
+        <Suspense>
+          <Header/>
+        </Suspense>
         {children}
     </div>
   )

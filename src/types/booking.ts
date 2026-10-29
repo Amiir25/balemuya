@@ -10,3 +10,14 @@ export type MyBooking = {
   createdAt: string;
   provider: { id: string; name: string; service: string };
 };
+
+export type ProviderRequest = {
+  id: string;
+  status: BookingStatus;
+  scheduledDate: string;
+  scheduledTime: string;
+  address: string;
+  notes: string | null;
+  createdAt: string;
+  customer: { name: string; phone: string | null };
+};

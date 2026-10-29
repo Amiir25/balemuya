@@ -227,3 +227,18 @@ export function getBookingById(id: string) {
 export function updateBookingStatus(id: string, status: "accepted" | "declined") {
   return prisma.booking.update({ where: { id }, data: { status } });
 }
+
+// Update provider profile
+export function updateProviderProfile(
+  id: string,
+  data: {
+    serviceId: string;
+    address: string;
+    headline: string;
+    bio: string;
+    priceFrom: number;
+    priceUnit: string;
+  }
+) {
+  return prisma.provider.update({ where: { id }, data });
+}

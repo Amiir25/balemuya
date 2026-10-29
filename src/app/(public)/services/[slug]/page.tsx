@@ -6,7 +6,7 @@ import {
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import ProviderCard from "../../providers/ProviderCard";
+import ProviderCard from "../../providers/components/ProviderCard";
 import { Suspense } from "react";
 
 type Props = { params: Promise<{ slug: string }> };

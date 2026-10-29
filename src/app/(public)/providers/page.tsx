@@ -1,7 +1,7 @@
 import { getAllServicesWithProviders } from "@/lib/db";
 import Link from "next/link";
 import React, { Suspense } from "react";
-import ProviderCard from "./ProviderCard";
+import ProviderCard from "./components/ProviderCard";
 
 export default function ProvidersPage() {
   return (
